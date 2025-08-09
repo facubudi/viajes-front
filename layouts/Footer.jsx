@@ -13,7 +13,7 @@ const Footer = () => {
                   GALERIA VIA DE LA FONTANA - LOCAL 14 <br />
                   CÓRDOBA - ARGENTINA<br /><br />
                   (+54) 351-393-4673<br />
-                  ADRIYORNET@GMAIL.COM<br />
+                  VAYAPASAJESYTURISMO@GMAIL.COM<br />
                 </p>
               </div>
   
