@@ -1,67 +1,158 @@
-import React from 'react';
+import Link from "next/link";
+import { forwardRef } from "react";
 
-const Footer = () => {
-    return (
-        <footer id="footer">
-        <div className="footer-top">
-          <div className="container">
-            <div className="row">
-  
-              <div className="col-lg-4 col-md-4 footer-contact">
-                <p className="text-center">
-                <a href="/" className="logo"><img src="/assets/images/logo.png" alt="" className="img-fluid"/></a><br /><br />
-                  GALERIA VIA DE LA FONTANA - LOCAL 14 <br />
-                  CÓRDOBA - ARGENTINA<br /><br />
-                  (+54) 351-393-4673<br />
-                  VAYAPASAJESYTURISMO@HOTMAIL.COM<br />
-                </p>
-              </div>
-  
-              <div className="col-lg-4 col-md-4 footer-links">
-                <h4 className="text-center">NAVEGACIÓN</h4>
-                <ul className="text-center">
-                  <li><a href="/">INICIO</a></li>
-                  <li><a href="/destinos">DESTINOS</a></li>
-                  <li><a href="/nosotros">NOSOTROS</a></li>
-                  <li><a href="/contacto">CONTACTO</a></li>
-                  <li><a href="/login">LOGIN</a></li>
-                </ul>
-              </div>
-  
-              <div className="col-lg-4 col-md-4 footer-links">
-                <h4 className="text-center">REDES SOCIALES</h4>
-                <div className="social-links text-center  pt-3 pt-md-0">
-                  <a href="https://www.facebook.com/vayapasajesyturismo" target='_blank' className="facebook">
-                    <svg width="43" height="41" viewBox="0 0 43 41" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M29.8307 3.34961H12.2832C7.43762 3.34961 3.50949 7.09892 3.50949 11.7239V28.4726C3.50949 33.0976 7.43762 36.8469 12.2832 36.8469H29.8307C34.6762 36.8469 38.6044 33.0976 38.6044 28.4726V11.7239C38.6044 7.09892 34.6762 3.34961 29.8307 3.34961Z" stroke="#3C3C50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M28.0759 19.0434C28.2925 20.4373 28.043 21.8609 27.3631 23.1117C26.6831 24.3625 25.6072 25.3768 24.2885 26.0103C22.9698 26.6439 21.4753 26.8644 20.0177 26.6405C18.5601 26.4166 17.2136 25.7598 16.1697 24.7634C15.1257 23.7669 14.4376 22.4817 14.203 21.0905C13.9685 19.6992 14.1995 18.2728 14.8633 17.0141C15.527 15.7554 16.5897 14.7285 17.9001 14.0795C19.2106 13.4305 20.702 13.1924 22.1624 13.3991C23.6521 13.61 25.0312 14.2725 26.096 15.2889C27.1609 16.3053 27.855 17.6216 28.0759 19.0434Z" stroke="#3C3C50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M30.708 10.8867H30.7252" stroke="#3C3C50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>                  
-                  </a>
-                  <a href="https://www.instagram.com/vayaturismo" target='_blank' className="instagram">
-                    <svg width="43" height="39" viewBox="0 0 43 39" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M31.6844 3.20703H26.4202C24.0932 3.20703 21.8616 4.05178 20.2162 5.55544C18.5708 7.0591 17.6464 9.09851 17.6464 11.225V16.0358H12.3822V22.4502H17.6464V35.2789H24.6654V22.4502H29.9296L31.6844 16.0358H24.6654V11.225C24.6654 10.7997 24.8503 10.3918 25.1794 10.0911C25.5084 9.79036 25.9548 9.62141 26.4202 9.62141H31.6844V3.20703Z" stroke="#3C3C50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>                  
-                  </a>
-                  <a href="mailto:adriyornet@gmail.com" target='_blank' className="linkedin">
-                    <svg width="42" height="38" viewBox="0 0 42 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect width="42" height="37.2376" transform="translate(0 0.427246)" fill="white"/>
-                      <path d="M7 6.6333H35C36.925 6.6333 38.5 8.02971 38.5 9.73643V28.3552C38.5 30.0619 36.925 31.4583 35 31.4583H7C5.075 31.4583 3.5 30.0619 3.5 28.3552V9.73643C3.5 8.02971 5.075 6.6333 7 6.6333Z" fill="white" stroke="#3C3C50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M38.5 9.73682L21 20.5978L3.5 9.73682" fill="white"/>
-                      <path d="M38.5 9.73682L21 20.5978L3.5 9.73682" stroke="#3C3C50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>                  
-                  </a>
-                </div>
-              </div>
+const navLinks = [
+  { label: "Inicio", href: "/" },
+  { label: "Destinos", href: "/destinos" },
+  { label: "Nosotros", href: "/nosotros" },
+  { label: "Contacto", href: "/contacto" },
+];
 
+const Footer = forwardRef(function Footer(props, ref) {
+  return (
+    <footer ref={ref} className="bg-[#0f0f0f] pt-20 pb-8 px-6">
+      <div className="max-w-7xl mx-auto">
+
+        {/* Top — logo + tagline */}
+        <div className="border-b border-white/10 pb-14 mb-14 flex flex-col md:flex-row items-start md:items-end justify-between gap-10">
+          <div>
+            <Link href="/">
+              <img
+                src="/images/vpt_logo_white.svg"
+                alt="Vaya Turismo"
+                className="h-12 w-auto mb-2"
+              />
+            </Link>
+            <p className="text-white text-[14px] font-normal mb-5" style={{ fontFamily: "Neue Haas, sans-serif" }}>
+              Vaya Turismo
+            </p>
+            <p className="text-white/40 text-[14px] font-light leading-relaxed max-w-xs">
+              De Córdoba al mundo.<br />
+              Diseñamos cada viaje a medida.
+            </p>
+          </div>
+
+          <div className="flex gap-4">
+            <a
+              href="https://www.instagram.com/vayaturismo"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="w-9 h-9 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-colors duration-200"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+              </svg>
+            </a>
+            <a
+              href="https://www.facebook.com/vayapasajesyturismo"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              className="w-9 h-9 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-colors duration-200"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+              </svg>
+            </a>
+            <a
+              href="https://wa.me/5493513934673"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp"
+              className="w-9 h-9 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-colors duration-200"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.115.549 4.099 1.51 5.833L.057 23.08a.75.75 0 0 0 .916.932l5.4-1.416A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.694 9.694 0 0 1-4.95-1.355l-.355-.211-3.683.965.981-3.584-.232-.369A9.713 9.713 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        {/* Middle — columnas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+
+          {/* Contacto */}
+          <div>
+            <p className="text-white/25 text-[10px] tracking-[0.35em] uppercase mb-5 font-normal">
+              Contacto
+            </p>
+            <div className="flex flex-col gap-2.5 text-[14px] text-white/50 font-light">
+              <span>Galería Vía de la Fontana — Local 14</span>
+              <span>Córdoba, Argentina</span>
+              <span className="mt-1">(+54) 351-393-4673</span>
+              <span>vayapasajesyturismo@hotmail.com</span>
             </div>
           </div>
-          <hr style={{width:'60%', textAlign: 'center', marginLeft: 'auto', marginRight:'auto', color:'#968778', borderWidth: '2px'}} />
-          <p className="text-center">Vaya Pasajes y Turismo | Desarrollado por <a href="https://www.linkedin.com/in/facugirardi/" target='_blank' className='a-names'>Facundo Girardi</a> y <a target='_blank' className='a-names' href="https://www.linkedin.com/in/alejo-vaquero-3b62a820b/">Alejo Vaquero</a></p>
+
+          {/* Navegación */}
+          <div>
+            <p className="text-white/25 text-[10px] tracking-[0.35em] uppercase mb-5 font-normal">
+              Navegación
+            </p>
+            <ul className="flex flex-col gap-3">
+              {navLinks.map((l) => (
+                <li key={l.href}>
+                  <Link
+                    href={l.href}
+                    className="text-white/50 text-[14px] font-light hover:text-white transition-colors duration-200"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Horarios */}
+          <div>
+            <p className="text-white/25 text-[10px] tracking-[0.35em] uppercase mb-5 font-normal">
+              Horarios
+            </p>
+            <div className="flex flex-col gap-2.5 text-[14px] text-white/50 font-light">
+              <div className="flex justify-between gap-8">
+                <span>Lunes — Viernes</span>
+                <span>10:00 — 18:00</span>
+              </div>
+              <div className="flex justify-between gap-8">
+                <span>Sábado</span>
+                <span>Cerrado</span>
+              </div>
+              <div className="flex justify-between gap-8">
+                <span>Domingo</span>
+                <span>Cerrado</span>
+              </div>
+            </div>
+          </div>
+
         </div>
-  
-        </footer>  
-    );
-};
+
+        {/* Bottom */}
+        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-2">
+          <p className="text-white/25 text-[13px] font-light tracking-wide">
+            © {new Date().getFullYear()} Vaya Pasajes y Turismo. Todos los derechos reservados.
+          </p>
+          <p className="text-white/25 text-[13px] font-light">
+            desarrollado por{" "}
+            <a
+              href="https://nuba.studio"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, display: "inline-flex", flexDirection: "column", lineHeight: 1.1, verticalAlign: "middle", marginLeft: "10px" }}
+              className="hover:text-white transition-colors duration-200"
+            >
+              <span>nuba</span>
+              <span>studio</span>
+            </a>
+          </p>
+        </div>
+
+      </div>
+    </footer>
+  );
+});
 
 export default Footer;
