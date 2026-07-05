@@ -1,47 +1,37 @@
-'use client'
+"use client";
 
-// Importar módulos necesarios
-import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import Footer from "@/layouts/Footer";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import "@/public/assets/vendor/bootstrap-icons/bootstrap-icons.css";
-import "@/public/assets/vendor/boxicons/css/boxicons.min.css";
-import "@/public/assets/vendor/glightbox/css/glightbox.min.css";
-import "@/public/assets/vendor/remixicon/remixicon.css";
-import "@/public/assets/vendor/swiper/swiper-bundle.min.css";
-import "swiper/css";
-import "swiper/css/pagination";
-// import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import "@/public/assets/js/main.js";
-import './login-styles.css'
-import '../globals2.css'
-import axios from "axios";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Importa estilos de toastify
+import { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Navbar from "@/components/home/Navbar";
 
-const SignIn = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+const inputClass =
+  "w-full bg-white border border-gray-200 px-5 py-3.5 outline-none text-dark text-[15px] font-light placeholder:text-muted/50 focus:border-dark transition-colors duration-150";
+
+function Field({ label, children }) {
+  return (
+    <div>
+      <label className="block text-[10px] tracking-[0.2em] uppercase text-muted font-normal mb-1.5">
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
-  // Redirigir al dashboard si ya está logueado
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      window.location.href = "/dashboard"; // Redirección si está logueado
+    if (localStorage.getItem("token")) {
+      window.location.href = "/dashboard";
     }
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -49,99 +39,70 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("https://api.vayaturismo.com/login", formData);
-      const { token, user } = response.data;
+      const response = await fetch("https://viajes-back-sre6.onrender.com/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
 
-      // Guardar token en localStorage
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
+      if (!response.ok) {
+        throw new Error(data.error || "Error al iniciar sesión");
+      }
 
-      // Redirigir al usuario después de un breve retraso
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 3000);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      window.location.href = "/dashboard";
     } catch (err) {
-      toast.error(err.response?.data?.error || "Error al iniciar sesión");
-    } finally {
+      toast.error(err.message || "Error al iniciar sesión");
       setLoading(false);
     }
   };
 
   return (
     <>
-      {/* Toast Container para mostrar las notificaciones */}
       <ToastContainer />
+      <Navbar />
 
-      <hr className="top-line" />
-      <header id="header" className="fixed-top ">
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-4 col-md-4 d-flex align-items-center">
-              <a href="/" className="logo">
-                <img src="/assets/images/logo.png" alt="" className="img-fluid" />
-              </a>
-            </div>
-            <nav id="navbar" className="navbar col-lg-4 col-md-4 justify-content-end ">
-              <ul>
-                <li><a className="nav-link scrollto" href="/">INICIO</a></li>
-                <div className="vertical-line" style={{ height: "25px" }}></div>
-                <li><a className="nav-link scrollto " href="/destinos">DESTINOS</a></li>
-                <div className="vertical-line" style={{ height: "25px" }}></div>
-                <li><a className="nav-link scrollto" href="/">SERVICIOS</a></li>
-                <div className="vertical-line" style={{ height: "25px" }}></div>
-                <li><a className="nav-link scrollto " href="/nosotros">NOSOTROS</a></li>  
-                <li><a className="nav-link scrollto contact-li" href="/contacto">CONTACTO</a></li>  
-              </ul>
-            </nav>
-            <div className="col-lg-4 col-md-4 d-flex justify-content-end cont-li" >
-              <a className="contact-button nav-link scrollto" href="/contacto">CONTACTO</a>
-            </div>
-          </div>
-        </div>
-      </header>
+      <section className="min-h-screen flex items-center justify-center bg-[#f7f6f4] px-6 pt-24 pb-16">
+        <div className="w-full max-w-sm bg-white border border-gray-200 p-8">
+          <h1 className="font-serif text-dark text-2xl font-light mb-8">¡Bienvenido!</h1>
 
-      <div className="wrapper">
-        <form onSubmit={handleSubmit}>
-          <div className="flex-item-logo">
-          </div>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <Field label="Correo electrónico">
+              <input
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Ingresa tu correo electrónico"
+                className={inputClass}
+                required
+              />
+            </Field>
 
-          <div className="flex-item">
-            <h3>¡Bienvenido!</h3>
-          </div>
+            <Field label="Contraseña">
+              <input
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Ingresa tu contraseña"
+                className={inputClass}
+                required
+              />
+            </Field>
 
-          <div className="input-box flex-item email-box">
-            <label className="label_input">Correo electrónico</label>
-            <input
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Ingresa tu correo electrónico"
-              required
-            />
-          </div>
-
-          <div className="input-box flex-item">
-            <label className="label_input">Contraseña</label>
-            <input
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Ingresa tu contraseña"
-              required
-            />
-          </div>
-
-          <div className="flex-item">
-            <button className="" type="submit" disabled={loading}>
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-2 bg-dark text-white text-[12px] tracking-[0.25em] uppercase px-8 py-4 hover:bg-gold hover:text-dark transition-colors duration-200 disabled:opacity-50"
+            >
               {loading ? "Cargando..." : "Iniciar sesión"}
             </button>
-          </div>
-        </form>
-      </div>
+          </form>
+        </div>
+      </section>
     </>
   );
-};
-
-export default SignIn;
+}

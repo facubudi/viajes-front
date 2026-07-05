@@ -8,11 +8,11 @@ import AdminShell from "@/components/admin/AdminShell";
 
 const API_URL = "https://viajes-back-sre6.onrender.com";
 
-export default function DashboardPage() {
+export default function DestinosAdminPage() {
   const [loading, setLoading] = useState(true);
-  const [packages, setPackages] = useState([]);
+  const [destinos, setDestinos] = useState([]);
   const [fetchError, setFetchError] = useState(false);
-  const [packageToDelete, setPackageToDelete] = useState(null);
+  const [destinoToDelete, setDestinoToDelete] = useState(null);
 
   useEffect(() => {
     if (!localStorage.getItem("token")) {
@@ -20,45 +20,32 @@ export default function DashboardPage() {
       return;
     }
 
-    const fetchPackages = async () => {
-      try {
-        const response = await fetch(`${API_URL}/packages`);
-        const data = await response.json();
-        if (response.ok) {
-          setPackages(data);
-        } else {
-          setFetchError(true);
-        }
-      } catch (err) {
-        console.error("Error al obtener los paquetes:", err);
-        setFetchError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPackages();
+    fetch(`${API_URL}/destinos`)
+      .then((res) => res.json())
+      .then((data) => setDestinos(Array.isArray(data) ? data : []))
+      .catch(() => setFetchError(true))
+      .finally(() => setLoading(false));
   }, []);
 
   const handleDelete = async () => {
-    if (!packageToDelete) return;
+    if (!destinoToDelete) return;
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/delete_package/${packageToDelete}`, {
+      const response = await fetch(`${API_URL}/api/destinos/${destinoToDelete}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (!response.ok) throw new Error("Error al eliminar el paquete");
-
       const result = await response.json();
+
+      if (!response.ok) throw new Error(result.error || "Error al eliminar el destino");
+
       toast.success(result.message);
-      setPackageToDelete(null);
-      setPackages((prev) => prev.filter((p) => p.id !== packageToDelete));
+      setDestinoToDelete(null);
+      setDestinos((prev) => prev.filter((d) => d.id !== destinoToDelete));
     } catch (error) {
-      console.error("Error:", error);
-      toast.error("No se pudo eliminar el paquete");
+      toast.error(error.message);
+      setDestinoToDelete(null);
     }
   };
 
@@ -77,54 +64,53 @@ export default function DashboardPage() {
       <div className="px-8 py-10">
         <div className="flex items-center justify-between mb-8">
           <h1 className="font-serif text-dark text-xl font-light">
-            Dashboard <span className="text-muted text-[15px]">&gt; Paquetes</span>
+            Dashboard <span className="text-muted text-[15px]">&gt; Destinos</span>
           </h1>
           <button
-            onClick={() => (window.location.href = "/create-package")}
+            onClick={() => (window.location.href = "/destinos-admin/create")}
             className="bg-dark text-white text-[12px] tracking-[0.2em] uppercase px-6 py-3 hover:bg-gold hover:text-dark transition-colors duration-200"
           >
-            Crear paquete
+            Crear destino
           </button>
         </div>
 
         {fetchError && (
           <p className="border border-gray-200 text-muted text-sm text-center py-6">
-            Error al cargar los paquetes. Inténtalo más tarde.
+            Error al cargar los destinos. Inténtalo más tarde.
           </p>
         )}
 
-        {!fetchError && packages.length === 0 && (
+        {!fetchError && destinos.length === 0 && (
           <p className="border border-gray-200 text-muted text-sm text-center py-6">
-            No hay paquetes disponibles
+            No hay destinos disponibles
           </p>
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          {packages.map((pack) => (
-            <div key={pack.id} className="group relative border border-gray-200 overflow-hidden" style={{ aspectRatio: "4/3" }}>
+          {destinos.map((destino) => (
+            <div key={destino.id} className="group relative border border-gray-200 overflow-hidden" style={{ aspectRatio: "4/3" }}>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  setPackageToDelete(pack.id);
+                  setDestinoToDelete(destino.id);
                 }}
-                aria-label="Eliminar paquete"
+                aria-label="Eliminar destino"
                 className="absolute top-2 right-2 z-10 w-8 h-8 bg-white/90 flex items-center justify-center text-dark/60 hover:text-dark transition-colors duration-150"
               >
                 <Trash size={16} weight="bold" />
               </button>
 
               <img
-                src={pack.images?.[0] || "/assets/images/places/image.png"}
-                alt={pack.title}
-                onClick={() => (window.location.href = `/edit-package/${pack.id}`)}
+                src={destino.image || "/assets/images/places/image.png"}
+                alt={destino.name}
+                onClick={() => (window.location.href = `/destinos-admin/${destino.id}`)}
                 className="w-full h-full object-cover cursor-pointer transition-transform duration-500 group-hover:scale-105"
               />
 
               <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white px-3 py-2.5 pointer-events-none">
-                <p className="text-[13px] font-light truncate">{pack.title}</p>
+                <p className="text-[13px] font-light truncate">{destino.name}</p>
                 <p className="text-[11px] text-white/70 font-light truncate">
-                  {pack.destino?.name}
-                  {pack.price_amount ? ` · ${pack.price_currency} ${pack.price_amount}` : ""}
+                  {destino.category} · {destino.paquetes?.length || 0} paquete{destino.paquetes?.length === 1 ? "" : "s"}
                 </p>
               </div>
             </div>
@@ -132,16 +118,16 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {packageToDelete && (
+      {destinoToDelete && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-6">
           <div className="bg-white max-w-sm w-full p-6">
             <h3 className="font-serif text-dark text-lg font-light mb-3">Confirmar eliminación</h3>
             <p className="text-muted text-[14px] font-light mb-6">
-              ¿Estás seguro de que deseas eliminar este paquete?
+              ¿Estás seguro de que deseas eliminar este destino? No se puede si tiene paquetes asociados.
             </p>
             <div className="flex justify-end gap-3">
               <button
-                onClick={() => setPackageToDelete(null)}
+                onClick={() => setDestinoToDelete(null)}
                 className="px-5 py-2.5 text-[12px] tracking-[0.15em] uppercase text-dark/60 hover:text-dark transition-colors duration-150"
               >
                 Cancelar

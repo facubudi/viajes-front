@@ -16,12 +16,12 @@ export default function DestinosSection({ packages }) {
               {packages.slice(0, 5).map((pack) => (
                 <div
                   key={pack.id}
-                  onClick={() => router.push(`/destinos/${pack.id}`)}
+                  onClick={() => router.push(`/destinos/${pack.slug}`)}
                   className="group cursor-pointer flex flex-col"
                 >
                   <div className="overflow-hidden" style={{ aspectRatio: "2/3" }}>
                     <img
-                      src={pack.images?.[0] || "/assets/images/places/image.png"}
+                      src={pack.image || "/assets/images/places/image.png"}
                       alt={pack.name}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />

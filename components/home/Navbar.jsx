@@ -5,7 +5,7 @@ import Link from "next/link";
 const leftLinks = [
   { label: "Inicio", href: "/" },
   { label: "Destinos", href: "/destinos" },
-  { label: "Servicios", href: "#servicios" },
+  { label: "Paquetes", href: "/paquetes" },
   { label: "Nosotros", href: "/nosotros" },
 ];
 
@@ -27,7 +27,7 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-50 ${
         scrolled ? "bg-white/80 backdrop-blur-md border-b border-white/20" : "bg-transparent"
       }`}
     >

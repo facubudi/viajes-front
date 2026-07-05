@@ -1,40 +1,22 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { getDestinoBySlug } from "@/data/destinos";
 
-const PAQUETES = [
-  {
-    id: 1,
-    destino: "Islas Maldivas",
-    descripcion: "Villas sobre el agua, arrecifes de coral y atardeceres infinitos.",
-    duracion: "10 días",
-    precio: "USD 2.800",
-    imagen: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80",
-  },
-  {
-    id: 2,
-    destino: "Santorini",
-    descripcion: "Arquitectura blanca, vinos locales y el mar Egeo de fondo.",
-    duracion: "7 días",
-    precio: "USD 1.900",
-    imagen: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&q=80",
-  },
-  {
-    id: 3,
-    destino: "Tokio",
-    descripcion: "Tradición y modernidad en una de las ciudades más fascinantes del mundo.",
-    duracion: "12 días",
-    precio: "USD 2.400",
-    imagen: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80",
-  },
-  {
-    id: 4,
-    destino: "Patagonia",
-    descripcion: "Torres imponentes, glaciares y silencio en el fin del mundo.",
-    duracion: "8 días",
-    precio: "USD 1.100",
-    imagen: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80",
-  },
-];
+const DESTACADOS_SLUGS = ["islas-maldivas", "santorini", "tokio", "patagonia"];
+
+const PAQUETES = DESTACADOS_SLUGS.map((slug) => {
+  const destino = getDestinoBySlug(slug);
+  const paquete = destino.paquetes[0];
+  return {
+    id: paquete.id,
+    destinoSlug: destino.slug,
+    destino: destino.name,
+    descripcion: paquete.description,
+    duracion: paquete.duration,
+    precio: paquete.price,
+    imagen: paquete.images[0],
+  };
+});
 
 export default function PaquetesSection() {
   const router = useRouter();
@@ -55,8 +37,8 @@ export default function PaquetesSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-100">
           {PAQUETES.map((p) => (
             <div
-              key={p.id}
-              onClick={() => router.push(`/destinos/${p.id}`)}
+              key={`${p.destinoSlug}-${p.id}`}
+              onClick={() => router.push(`/destinos/${p.destinoSlug}/${p.id}`)}
               className="group relative bg-white cursor-pointer overflow-hidden"
             >
               <div className="relative overflow-hidden" style={{ aspectRatio: "16/9" }}>

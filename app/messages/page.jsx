@@ -1,184 +1,90 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Nav, Navbar, Spinner, Alert, Button  } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "@/public/assets/vendor/bootstrap-icons/bootstrap-icons.css";
-import "../globals2.css";
-import "./style.css";
-import { House, ChatText, Airplane, SignOut } from "phosphor-react";
-import { usePathname } from "next/navigation"; // Importar usePathname
 
-const Page = () => {
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const pathname = usePathname(); // Obtener la URL actual
-  const [loading, setLoading] = useState(true); // Estado para el loader
+import { useEffect, useState } from "react";
+import AdminShell from "@/components/admin/AdminShell";
+
+const API_URL = "https://viajes-back-sre6.onrender.com";
+
+function formatDate(iso) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+export default function MessagesPage() {
+  const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState([]);
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       window.location.href = "/login";
+      return;
     }
-    const fetchMessages = async () => {
-      try {
-        const response = await fetch("https://api.vayaturismo.com/messages");
-        const data = await response.json();
-        setMessages(data);
-        console.log(messages)
-      } catch (error) {
-        console.error("Error fetching messages:", error);
-      }
-    };
-    fetchMessages();
-    setTimeout(() => setLoading(false), 400);
+
+    fetch(`${API_URL}/messages`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((res) => {
+        if (!res.ok) throw new Error("Error al obtener los mensajes");
+        return res.json();
+      })
+      .then((data) => setMessages(Array.isArray(data) ? data : []))
+      .catch(() => setFetchError(true))
+      .finally(() => setLoading(false));
   }, []);
 
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
-  };
-
-  const toggleSidebar = () => {
-    setSidebarOpen((prev) => !prev);
-  };
   if (loading) {
-    // Mostrar el loader mientras el estado `loading` sea true
     return (
-      <div className="loader-container">
-        <Spinner animation="border" role="status" className="loader">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted text-sm tracking-wide">Cargando...</p>
       </div>
     );
   }
 
   return (
-    <>
-      <div className={`dashboard ${isSidebarOpen ? "sidebar-open" : ""}`}>
-        {/* Sidebar */}
-        <div className={`sidebar ${isSidebarOpen ? "active" : ""}`}>
-          <Nav defaultActiveKey="/" className="flex-column">
-          <a href="/" className="logo"><img src="assets/images/logo.png" alt="" className="img-fluid logodashboard"/></a>
-          <hr style={{
-            border: "none",
-            borderTop: "1px solid rgb(184, 187, 191)",
-            marginTop: "25px !important"
-          }} />
-            <Nav.Link
-              href="/"
-              className={`textl hometext ${pathname === "/" ? "active-link" : ""}`}
-            >
-              <House size={20} weight="bold" className="me-2" /> Inicio
-            </Nav.Link>
-            <Nav.Link
-              href="/dashboard"
-              className={`textl ${pathname === "/dashboard" ? "active-link" : ""}`}
-            >
-              <Airplane size={20} weight="bold" className="me-2" /> Paquetes
-            </Nav.Link>
-            <Nav.Link
-              href="/messages"
-              className={`textl ${pathname === "/messages" ? "active-link" : ""}`}
-            >
-              <ChatText size={20} weight="bold" className="me-2" /> Mensajes
-            </Nav.Link>
-            <Nav.Link onClick={logout} className="textl">
-            <SignOut size={20} weight="bold" className="me-2" /> Cerrar Sesión
-            </Nav.Link>
-          </Nav>
-        </div>
+    <AdminShell>
+      <div className="px-8 py-10">
+        <h1 className="font-serif text-dark text-xl font-light mb-8">
+          Dashboard <span className="text-muted text-[15px]">&gt; Mensajes</span>
+        </h1>
 
-        {/* Main Content */}
-        <div className="main-content">
-          {/* Topbar */}
-          <Navbar className="navbar px-3">
-            <button
-              className="btn btn-outline-primary d-lg-none"
-              onClick={toggleSidebar}
-            >
-              <i className="bi bi-list"></i>
-            </button>
-          </Navbar>
+        {fetchError && (
+          <p className="border border-gray-200 text-muted text-sm text-center py-6">
+            Error al cargar los mensajes. Inténtalo más tarde.
+          </p>
+        )}
 
-          {/* Page Content */}
-          <Container fluid className="py-4">
-            <h5 className="dashboard-title">Dashboard <span className="mensajes-title">&gt; Mensajes</span></h5>
-          {messages.length === 0 ? (
-              <Alert variant="warning" className="alertme text-center">No hay mensajes.</Alert>
-            ) : (
-              <Row className="mtrow d-flex justify-content-center">
-                {messages.map((msg, index) => (
-                  <Col xs={12} md={5} key={index} className="col-message"
-                  onClick={() => window.location.href = `https://vayaturismo.com/messages/${msg.id}`}>
-                    <Button variant="primary" className={`btnv w-100 mb-2 d-flex justify-content-between align-items-center ${msg.leido ? "leido" : ""}`}>
-                      <span>{msg.category}</span>
-                      <span>Ver más</span>
-                    </Button>
-                  </Col>
-                ))}
-              </Row>
-            )}
-          </Container>
-        </div>
+        {!fetchError && messages.length === 0 && (
+          <p className="border border-gray-200 text-muted text-sm text-center py-6">No hay mensajes.</p>
+        )}
+
+        {messages.length > 0 && (
+          <div className="max-w-3xl border-t border-gray-200">
+            {messages.map((msg) => (
+              <a
+                key={msg.id}
+                href={`/messages/${msg.id}`}
+                className="flex items-center justify-between gap-4 px-1 py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-150"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${msg.leido ? "bg-gray-300" : "bg-gold"}`}
+                    aria-hidden
+                  />
+                  <div className="min-w-0">
+                    <p className={`text-[14px] truncate ${msg.leido ? "font-light text-dark/70" : "font-normal text-dark"}`}>
+                      {msg.name}
+                    </p>
+                    <p className="text-[12px] text-muted font-light truncate">
+                      {msg.category} · {formatDate(msg.created_at)}
+                    </p>
+                  </div>
+                </div>
+                <span className="shrink-0 text-[11px] tracking-[0.15em] uppercase text-muted">Ver más</span>
+              </a>
+            ))}
+          </div>
+        )}
       </div>
-
-      <style jsx>{`
-        .dashboard {
-          display: flex;
-          font-family: 'Poppins', sans-serif;
-
-        }
-        .sidebar {
-          width: 250px;
-          height: 100vh;
-          background-color: #FFFFFF;
-          border-right: 1px solid #dee2e6;
-          position: fixed;
-          top: 0;
-          left: 0;
-          transition: transform 0.3s ease-in-out;
-          z-index: 1030;
-        }
-        .sidebar.active {
-          transform: translateX(0);
-        }
-        .sidebar:not(.active) {
-          transform: translateX(-100%);
-        }
-        .main-content {
-          margin-left: 250px;
-          width: calc(100% - 250px);
-          transition: margin-left 0.3s ease-in-out;
-        }
-        .sidebar-open .main-content {
-          margin-left: 250px;
-        }
-        .navbar {
-          background: white;
-          border-bottom: 1px solid #dee2e6;
-        }
-        @media (max-width: 991px) {
-          body {
-            overflow-x: hidden !important; /* Evita el scroll lateral en móviles */
-          }
-
-          .sidebar {
-            transform: translateX(-100%);
-          }
-          .sidebar.active {
-      
-            transform: translateX(0);
-          }
-          .main-content {
-            margin-left: 0;
-            width: 100%;
-          }
-        }
-      `}</style>
-    </>
+    </AdminShell>
   );
-};
-
-export default Page;
+}

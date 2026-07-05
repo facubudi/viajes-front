@@ -7,57 +7,15 @@ import ServiciosSection from "@/components/home/ServiciosSection";
 import PaquetesSection from "@/components/home/PaquetesSection";
 import FAQSection from "@/components/home/FAQSection";
 import Footer from "@/layouts/Footer";
-
-const MOCK_PACKAGES = [
-  {
-    id: 1,
-    name: "Islas Maldivas",
-    images: ["https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=600&q=80"],
-    price: "USD 2.800",
-    duration: "10 días",
-  },
-  {
-    id: 2,
-    name: "Santorini",
-    images: ["https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=600&q=80"],
-    price: "USD 1.900",
-    duration: "7 días",
-  },
-  {
-    id: 3,
-    name: "Patagonia",
-    images: ["https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80"],
-    price: "USD 1.100",
-    duration: "8 días",
-  },
-  {
-    id: 4,
-    name: "Tokio",
-    images: ["https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&q=80"],
-    price: "USD 2.400",
-    duration: "12 días",
-  },
-  {
-    id: 5,
-    name: "Marruecos",
-    images: ["https://images.unsplash.com/photo-1489493585363-d69421e0edd3?w=600&q=80"],
-    price: "USD 1.300",
-    duration: "9 días",
-  },
-];
+import { MOCK_DESTINOS } from "@/data/destinos";
 
 export default function HomePage() {
-  const [packages, setPackages] = useState(MOCK_PACKAGES);
+  const [packages] = useState(MOCK_DESTINOS);
   const [scrolled, setScrolled] = useState(false);
   const [inFooter, setInFooter] = useState(false);
   const footerRef = useRef(null);
 
   useEffect(() => {
-    fetch("https://api.vayaturismo.com/packages")
-      .then((r) => r.json())
-      .then((data) => { if (data?.length) setPackages(data); })
-      .catch(() => {});
-
     const onScroll = () => setScrolled(window.scrollY > 200);
     window.addEventListener("scroll", onScroll);
 

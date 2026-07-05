@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const API_URL = "https://api.vayaturismo.com/packages";
+  const API_URL = "https://viajes-back-sre6.onrender.com/packages";
 
   // Hacer la solicitud a la API externa
   try {

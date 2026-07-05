@@ -1,0 +1,17 @@
+.loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Ocupa toda la altura de la pantalla */
+    width: 100vw; /* Opcional para asegurar ancho completo */
+    background-color: #FFFFFF; /* Fondo claro para el loader */
+    position: fixed; /* Fija el loader en la pantalla */
+    top: 0;
+    left: 0;
+    z-index: 1050; /* Asegura que esté sobre otros elementos */
+  }
+  
+  .loader {
+    color: #EDB04F; /* Color del spinner */
+    font-size: 1rem;
+  }
