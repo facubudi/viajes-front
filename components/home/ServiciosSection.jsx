@@ -35,7 +35,7 @@ export default function ServiciosSection() {
             Lo que ofrecemos
           </p>
           <h2 className="font-serif text-dark text-4xl md:text-5xl font-light tracking-tight">
-            Nuestros <span className="italic">Servicios</span>
+            Nuestros Servicios
           </h2>
           <p className="mt-5 text-muted text-[17px] font-light leading-relaxed tracking-wide max-w-sm mx-auto">
             Diseñamos cada viaje a medida, desde el alojamiento hasta la última experiencia.
