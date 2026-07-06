@@ -1,30 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import AdminShell from "@/components/admin/AdminShell";
-import SelectField from "@/components/destinos/SelectField";
+import { UploadSimple, ArrowLeft } from "phosphor-react";
+import AdminSelect from "@/components/admin/AdminSelect";
+import { Field, Card, EmptyState, inputClass, btnPrimary, btnGhost, Loader } from "@/components/admin/ui";
 import { CATEGORIES } from "@/components/destinos/FiltersDrawer";
 
 const API_URL = "https://viajes-back-sre6.onrender.com";
 
-const inputClass =
-  "w-full bg-white border border-gray-200 px-5 py-3.5 outline-none text-dark text-[15px] font-light placeholder:text-muted/50 focus:border-dark transition-colors duration-150";
-
-function Field({ label, children }) {
-  return (
-    <div>
-      <label className="block text-[10px] tracking-[0.2em] uppercase text-muted font-normal mb-1.5">
-        {label}
-      </label>
-      {children}
-    </div>
-  );
-}
-
 export default function EditDestinoPage({ params }) {
   const destinoId = params.destino;
+  const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -36,7 +26,7 @@ export default function EditDestinoPage({ params }) {
 
   useEffect(() => {
     if (!localStorage.getItem("token")) {
-      window.location.href = "/login";
+      router.replace("/login");
       return;
     }
 
@@ -52,7 +42,7 @@ export default function EditDestinoPage({ params }) {
       })
       .catch(() => setFetchError(true))
       .finally(() => setLoading(false));
-  }, [destinoId]);
+  }, [destinoId, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -71,61 +61,51 @@ export default function EditDestinoPage({ params }) {
         body: data,
       });
       const result = await response.json();
-
       if (!response.ok) throw new Error(result.error || "Error al actualizar el destino");
-
       toast.success("Destino actualizado con éxito");
-      setTimeout(() => (window.location.href = "/destinos-admin"), 800);
+      setTimeout(() => router.push("/destinos-admin"), 800);
     } catch (error) {
       toast.error(error.message);
       setSubmitting(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted text-sm tracking-wide">Cargando...</p>
-      </div>
-    );
-  }
+  if (loading) return <Loader />;
 
   if (fetchError) {
     return (
-      <AdminShell>
-        <div className="px-8 py-10">
-          <p className="border border-gray-200 text-muted text-sm text-center py-6">
-            No se pudo cargar el destino.
-          </p>
-        </div>
-      </AdminShell>
+      <Card>
+        <EmptyState title="No se pudo cargar el destino" description="Volvé al panel e intentá nuevamente." />
+      </Card>
     );
   }
 
   return (
-    <AdminShell>
+    <>
       <ToastContainer />
 
-      <div className="px-8 py-10 max-w-2xl">
-        <h1 className="font-serif text-dark text-xl font-light mb-8">
-          Dashboard <span className="text-muted text-[15px]">&gt; Editar destino</span>
-        </h1>
+      <Link href="/destinos-admin" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-dark mb-4 transition-colors">
+        <ArrowLeft size={15} weight="bold" />
+        Volver a destinos
+      </Link>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <form onSubmit={handleSubmit} className="max-w-xl">
+        <Card className="p-6 sm:p-8 flex flex-col gap-6">
+          <div>
+            <h1 className="text-lg font-semibold text-slate-900">Editar destino</h1>
+            <p className="text-sm text-slate-500 mt-0.5">Actualizá el nombre, categoría o imagen del destino.</p>
+          </div>
+
           <Field label="Imagen">
             {existingImage && !image && (
-              <div className="w-32 h-32 border border-gray-200 mb-3">
+              <div className="w-32 h-32 rounded-lg overflow-hidden border border-slate-200 mb-3">
                 <img src={existingImage} alt={name} className="w-full h-full object-cover" />
               </div>
             )}
-            <label className="flex flex-col items-center justify-center border border-dashed border-gray-300 h-32 cursor-pointer text-muted text-[13px] font-light hover:border-dark transition-colors duration-150">
+            <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-slate-300 rounded-lg h-32 cursor-pointer text-slate-500 text-sm hover:border-dark hover:bg-slate-50 transition-colors duration-150">
+              <UploadSimple size={22} className="text-slate-400" />
               {image ? image.name : "Click para reemplazar la imagen"}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setImage(e.target.files[0] || null)}
-                className="hidden"
-              />
+              <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files[0] || null)} className="hidden" />
             </label>
           </Field>
 
@@ -133,17 +113,18 @@ export default function EditDestinoPage({ params }) {
             <input value={name} onChange={(e) => setName(e.target.value)} className={inputClass} required />
           </Field>
 
-          <SelectField label="Categoría" value={category} options={CATEGORIES} placeholder="Elegir categoría" onChange={setCategory} />
+          <AdminSelect label="Categoría" value={category} options={CATEGORIES} placeholder="Elegir categoría" onChange={setCategory} />
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="mt-2 bg-dark text-white text-[12px] tracking-[0.25em] uppercase px-8 py-4 hover:bg-gold hover:text-dark transition-colors duration-200 disabled:opacity-50 self-start"
-          >
-            {submitting ? "Guardando..." : "Actualizar destino"}
-          </button>
-        </form>
-      </div>
-    </AdminShell>
+          <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+            <button type="submit" disabled={submitting} className={btnPrimary}>
+              {submitting ? "Guardando..." : "Actualizar destino"}
+            </button>
+            <Link href="/destinos-admin" className={btnGhost}>
+              Cancelar
+            </Link>
+          </div>
+        </Card>
+      </form>
+    </>
   );
 }

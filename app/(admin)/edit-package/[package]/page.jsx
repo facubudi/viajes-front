@@ -1,34 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { X } from "phosphor-react";
-import AdminShell from "@/components/admin/AdminShell";
-import SelectField from "@/components/destinos/SelectField";
-import DateRangeField from "@/components/destinos/DateRangeField";
+import { X, UploadSimple, ArrowLeft } from "phosphor-react";
+import AdminSelect from "@/components/admin/AdminSelect";
+import AdminDateRange from "@/components/admin/AdminDateRange";
+import { Field, Card, EmptyState, inputClass, btnPrimary, btnGhost, Loader } from "@/components/admin/ui";
 import { CATEGORIES } from "@/components/destinos/FiltersDrawer";
 
 const API_URL = "https://viajes-back-sre6.onrender.com";
 const ACCOMMODATIONS = ["Hotel", "Resort", "Aparthotel", "Crucero"];
 const CURRENCIES = ["USD", "ARS", "EUR"];
 
-const inputClass =
-  "w-full bg-white border border-gray-200 px-5 py-3.5 outline-none text-dark text-[15px] font-light placeholder:text-muted/50 focus:border-dark transition-colors duration-150";
-
-function Field({ label, children }) {
-  return (
-    <div>
-      <label className="block text-[10px] tracking-[0.2em] uppercase text-muted font-normal mb-1.5">
-        {label}
-      </label>
-      {children}
-    </div>
-  );
-}
-
 export default function EditPackagePage({ params }) {
   const packageId = params.package;
+  const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -54,7 +43,7 @@ export default function EditPackagePage({ params }) {
 
   useEffect(() => {
     if (!localStorage.getItem("token")) {
-      window.location.href = "/login";
+      router.replace("/login");
       return;
     }
 
@@ -84,28 +73,17 @@ export default function EditPackagePage({ params }) {
         setFetchError(true);
       })
       .finally(() => setLoading(false));
-  }, [packageId]);
+  }, [packageId, router]);
 
   const addInclude = () => {
     const value = includeDraft.trim();
-    if (value && !includes.includes(value)) {
-      setIncludes([...includes, value]);
-    }
+    if (value && !includes.includes(value)) setIncludes([...includes, value]);
     setIncludeDraft("");
   };
 
-  const removeInclude = (item) => {
-    setIncludes(includes.filter((i) => i !== item));
-  };
-
-  const handleImageUpload = (event) => {
-    setUploadedImages((prev) => [...prev, ...Array.from(event.target.files)]);
-  };
-
-  const removeNewImage = (index) => {
-    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
-  };
-
+  const removeInclude = (item) => setIncludes(includes.filter((i) => i !== item));
+  const handleImageUpload = (event) => setUploadedImages((prev) => [...prev, ...Array.from(event.target.files)]);
+  const removeNewImage = (index) => setUploadedImages((prev) => prev.filter((_, i) => i !== index));
   const removeExistingImage = (url) => {
     setExistingImages((prev) => prev.filter((img) => img !== url));
     setImagesToDelete((prev) => [...prev, url]);
@@ -141,11 +119,9 @@ export default function EditPackagePage({ params }) {
         headers: { Authorization: `Bearer ${token}` },
         body: data,
       });
-
       if (!response.ok) throw new Error("Error al actualizar el paquete");
-
       toast.success("Paquete actualizado con éxito");
-      setTimeout(() => (window.location.href = "/dashboard"), 800);
+      setTimeout(() => router.push("/dashboard"), 800);
     } catch (error) {
       console.error("Error al actualizar el paquete:", error);
       toast.error("Error al actualizar el paquete");
@@ -153,65 +129,62 @@ export default function EditPackagePage({ params }) {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted text-sm tracking-wide">Cargando...</p>
-      </div>
-    );
-  }
+  if (loading) return <Loader />;
 
   if (fetchError) {
     return (
-      <AdminShell>
-        <div className="px-8 py-10">
-          <p className="border border-gray-200 text-muted text-sm text-center py-6">
-            No se pudo cargar el paquete.
-          </p>
-        </div>
-      </AdminShell>
+      <Card>
+        <EmptyState title="No se pudo cargar el paquete" description="Volvé al panel e intentá nuevamente." />
+      </Card>
     );
   }
 
   return (
-    <AdminShell>
+    <>
       <ToastContainer />
 
-      <div className="px-8 py-10 max-w-2xl">
-        <h1 className="font-serif text-dark text-xl font-light mb-8">
-          Dashboard <span className="text-muted text-[15px]">&gt; Editar paquete</span>
-        </h1>
+      <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-dark mb-4 transition-colors">
+        <ArrowLeft size={15} weight="bold" />
+        Volver a paquetes
+      </Link>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <form onSubmit={handleSubmit} className="max-w-3xl">
+        <Card className="p-6 sm:p-8 flex flex-col gap-6">
+          <div>
+            <h1 className="text-lg font-semibold text-slate-900">Editar paquete</h1>
+            <p className="text-sm text-slate-500 mt-0.5">Actualizá la información del paquete turístico.</p>
+          </div>
+
           <Field label="Imágenes">
             {existingImages.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-3">
                 {existingImages.map((url) => (
-                  <div key={url} className="relative w-20 h-20 border border-gray-200">
+                  <div key={url} className="relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200">
                     <img src={url} alt="" className="w-full h-full object-cover" />
                     <button
                       type="button"
                       onClick={() => removeExistingImage(url)}
                       aria-label="Quitar imagen"
-                      className="absolute top-0.5 right-0.5 w-5 h-5 bg-white/90 flex items-center justify-center"
+                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-white/90 shadow flex items-center justify-center text-slate-600 hover:text-red-500"
                     >
-                      <X size={10} />
+                      <X size={11} weight="bold" />
                     </button>
                   </div>
                 ))}
               </div>
             )}
-            <label className="flex flex-col items-center justify-center border border-dashed border-gray-300 h-32 cursor-pointer text-muted text-[13px] font-light hover:border-dark transition-colors duration-150">
+            <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-slate-300 rounded-lg h-32 cursor-pointer text-slate-500 text-sm hover:border-dark hover:bg-slate-50 transition-colors duration-150">
+              <UploadSimple size={22} className="text-slate-400" />
               Click para subir imágenes nuevas
               <input type="file" multiple accept="image/*" onChange={handleImageUpload} className="hidden" />
             </label>
             {uploadedImages.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
                 {uploadedImages.map((file, i) => (
-                  <div key={i} className="flex items-center gap-2 border border-gray-200 px-3 py-1.5 text-[12px] text-dark/70">
-                    {file.name}
-                    <button type="button" onClick={() => removeNewImage(i)} aria-label="Quitar imagen">
-                      <X size={12} />
+                  <div key={i} className="flex items-center gap-2 bg-slate-100 rounded-lg px-3 py-1.5 text-xs text-slate-700">
+                    <span className="max-w-[160px] truncate">{file.name}</span>
+                    <button type="button" onClick={() => removeNewImage(i)} aria-label="Quitar imagen" className="text-slate-400 hover:text-red-500">
+                      <X size={13} weight="bold" />
                     </button>
                   </div>
                 ))}
@@ -232,17 +205,19 @@ export default function EditPackagePage({ params }) {
           </Field>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <Field label="Destino">
+            <div>
               {isNewDestino ? (
-                <input
-                  value={destinoName}
-                  onChange={(e) => setDestinoName(e.target.value)}
-                  placeholder="Nombre del destino nuevo"
-                  className={inputClass}
-                />
+                <Field label="Destino">
+                  <input
+                    value={destinoName}
+                    onChange={(e) => setDestinoName(e.target.value)}
+                    placeholder="Nombre del destino nuevo"
+                    className={inputClass}
+                  />
+                </Field>
               ) : (
-                <SelectField
-                  label=""
+                <AdminSelect
+                  label="Destino"
                   value={destinos.find((d) => String(d.id) === String(destinoName))?.name || ""}
                   options={destinos.map((d) => d.name)}
                   placeholder="Elegir destino"
@@ -255,41 +230,28 @@ export default function EditPackagePage({ params }) {
                   setIsNewDestino((v) => !v);
                   setDestinoName("");
                 }}
-                className="text-[11px] tracking-[0.15em] uppercase text-muted hover:text-dark transition-colors duration-150 mt-2"
+                className="text-xs font-medium text-slate-500 hover:text-dark transition-colors duration-150 mt-2"
               >
-                {isNewDestino ? "Elegir destino existente" : "+ Nuevo destino"}
+                {isNewDestino ? "← Elegir destino existente" : "+ Nuevo destino"}
               </button>
-            </Field>
+            </div>
 
             {isNewDestino && (
-              <SelectField label="Categoría" value={category} options={CATEGORIES} placeholder="Elegir categoría" onChange={setCategory} />
+              <AdminSelect label="Categoría" value={category} options={CATEGORIES} placeholder="Elegir categoría" onChange={setCategory} />
             )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <Field label="Duración (días)">
-              <input
-                type="number"
-                min="1"
-                value={durationDays}
-                onChange={(e) => setDurationDays(e.target.value)}
-                className={inputClass}
-              />
+              <input type="number" min="1" value={durationDays} onChange={(e) => setDurationDays(e.target.value)} className={inputClass} />
             </Field>
             <Field label="Precio">
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={priceAmount}
-                onChange={(e) => setPriceAmount(e.target.value)}
-                className={inputClass}
-              />
+              <input type="number" min="0" step="0.01" value={priceAmount} onChange={(e) => setPriceAmount(e.target.value)} className={inputClass} />
             </Field>
-            <SelectField label="Moneda" value={priceCurrency} options={CURRENCIES} onChange={setPriceCurrency} />
+            <AdminSelect label="Moneda" value={priceCurrency} options={CURRENCIES} onChange={setPriceCurrency} />
           </div>
 
-          <SelectField
+          <AdminSelect
             label="Alojamiento"
             value={accommodation}
             options={ACCOMMODATIONS}
@@ -311,21 +273,17 @@ export default function EditPackagePage({ params }) {
                 placeholder="Ej. Vuelos ida y vuelta"
                 className={inputClass}
               />
-              <button
-                type="button"
-                onClick={addInclude}
-                className="shrink-0 px-5 border border-gray-200 text-[12px] tracking-[0.15em] uppercase text-dark/70 hover:border-dark transition-colors duration-150"
-              >
+              <button type="button" onClick={addInclude} className={`${btnGhost} shrink-0`}>
                 Agregar
               </button>
             </div>
             {includes.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
                 {includes.map((item) => (
-                  <div key={item} className="flex items-center gap-2 border border-gray-200 px-4 py-2 text-[13px] font-light text-dark/80">
+                  <div key={item} className="flex items-center gap-2 bg-slate-100 rounded-lg px-3 py-1.5 text-sm text-slate-700">
                     {item}
-                    <button type="button" onClick={() => removeInclude(item)} aria-label="Quitar">
-                      <X size={12} />
+                    <button type="button" onClick={() => removeInclude(item)} aria-label="Quitar" className="text-slate-400 hover:text-red-500">
+                      <X size={13} weight="bold" />
                     </button>
                   </div>
                 ))}
@@ -333,7 +291,7 @@ export default function EditPackagePage({ params }) {
             )}
           </Field>
 
-          <DateRangeField
+          <AdminDateRange
             checkIn={departureDate}
             checkOut={returnDate}
             onChange={({ checkIn, checkOut }) => {
@@ -342,15 +300,16 @@ export default function EditPackagePage({ params }) {
             }}
           />
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="mt-2 bg-dark text-white text-[12px] tracking-[0.25em] uppercase px-8 py-4 hover:bg-gold hover:text-dark transition-colors duration-200 disabled:opacity-50 self-start"
-          >
-            {submitting ? "Guardando..." : "Actualizar paquete"}
-          </button>
-        </form>
-      </div>
-    </AdminShell>
+          <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+            <button type="submit" disabled={submitting} className={btnPrimary}>
+              {submitting ? "Guardando..." : "Actualizar paquete"}
+            </button>
+            <Link href="/dashboard" className={btnGhost}>
+              Cancelar
+            </Link>
+          </div>
+        </Card>
+      </form>
+    </>
   );
 }

@@ -7,13 +7,51 @@ import ServiciosSection from "@/components/home/ServiciosSection";
 import PaquetesSection from "@/components/home/PaquetesSection";
 import FAQSection from "@/components/home/FAQSection";
 import Footer from "@/layouts/Footer";
-import { MOCK_DESTINOS } from "@/data/destinos";
+import { MOCK_DESTINOS, getDestinoBySlug } from "@/data/destinos";
+
+const API_URL = "https://viajes-back-sre6.onrender.com";
+
+const MOCK_DESTINOS_DESTACADOS = MOCK_DESTINOS.slice(0, 5);
+
+const MOCK_PAQUETES_DESTACADOS_SLUGS = ["islas-maldivas", "santorini", "tokio", "patagonia"];
+const MOCK_PAQUETES_DESTACADOS = MOCK_PAQUETES_DESTACADOS_SLUGS.map((slug) => {
+  const destino = getDestinoBySlug(slug);
+  const paquete = destino.paquetes[0];
+  return {
+    id: paquete.id,
+    destino: { slug: destino.slug, name: destino.name },
+    description: paquete.description,
+    duration_days: parseInt(paquete.duration, 10) || null,
+    priceLabel: paquete.price,
+    images: paquete.images,
+    title: paquete.title,
+  };
+});
 
 export default function HomePage() {
-  const [packages] = useState(MOCK_DESTINOS);
+  // Mientras el backend no tenga suficientes destinos/paquetes cargados,
+  // convivimos con los mocks como fallback para no dejar el home vacío.
+  const [destinosDestacados, setDestinosDestacados] = useState(MOCK_DESTINOS_DESTACADOS);
+  const [paquetesDestacados, setPaquetesDestacados] = useState(MOCK_PAQUETES_DESTACADOS);
   const [scrolled, setScrolled] = useState(false);
   const [inFooter, setInFooter] = useState(false);
   const footerRef = useRef(null);
+
+  useEffect(() => {
+    fetch(`${API_URL}/home/destinos`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setDestinosDestacados(data);
+      })
+      .catch(() => {});
+
+    fetch(`${API_URL}/home/packages`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setPaquetesDestacados(data);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 200);
@@ -35,9 +73,9 @@ export default function HomePage() {
     <>
       <Navbar />
       <Hero />
-      <DestinosSection packages={packages} />
+      <DestinosSection packages={destinosDestacados} />
       <ServiciosSection />
-      <PaquetesSection />
+      <PaquetesSection packages={paquetesDestacados} />
       <FAQSection />
 
       <a

@@ -1,33 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Navbar from "@/components/home/Navbar";
-
-const inputClass =
-  "w-full bg-white border border-gray-200 px-5 py-3.5 outline-none text-dark text-[15px] font-light placeholder:text-muted/50 focus:border-dark transition-colors duration-150";
-
-function Field({ label, children }) {
-  return (
-    <div>
-      <label className="block text-[10px] tracking-[0.2em] uppercase text-muted font-normal mb-1.5">
-        {label}
-      </label>
-      {children}
-    </div>
-  );
-}
+import { Field, inputClass, btnPrimary } from "@/components/admin/ui";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem("token")) {
-      window.location.href = "/dashboard";
-    }
-  }, []);
+    if (localStorage.getItem("token")) router.replace("/dashboard");
+  }, [router]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,14 +31,11 @@ export default function LoginPage() {
         body: JSON.stringify(formData),
       });
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Error al iniciar sesión");
-      }
+      if (!response.ok) throw new Error(data.error || "Error al iniciar sesión");
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      window.location.href = "/dashboard";
+      router.push("/dashboard");
     } catch (err) {
       toast.error(err.message || "Error al iniciar sesión");
       setLoading(false);
@@ -60,14 +43,22 @@ export default function LoginPage() {
   };
 
   return (
-    <>
+    <div
+      className="min-h-screen bg-slate-50 flex items-center justify-center px-6 py-12"
+      style={{ fontFamily: "Neue Haas, sans-serif" }}
+    >
       <ToastContainer />
-      <Navbar />
 
-      <section className="min-h-screen flex items-center justify-center bg-[#f7f6f4] px-6 pt-24 pb-16">
-        <div className="w-full max-w-sm bg-white border border-gray-200 p-8">
-          <h1 className="font-serif text-dark text-2xl font-light mb-8">¡Bienvenido!</h1>
+      <div className="w-full max-w-sm">
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-14 h-14 rounded-xl bg-dark flex items-center justify-center mb-4">
+            <img src="/images/vpt_logo_white.svg" alt="Vaya Turismo" className="h-7 w-auto" />
+          </div>
+          <h1 className="text-xl font-semibold text-slate-900">Panel de administración</h1>
+          <p className="text-sm text-slate-500 mt-1">Iniciá sesión para continuar</p>
+        </div>
 
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <Field label="Correo electrónico">
               <input
@@ -75,7 +66,7 @@ export default function LoginPage() {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Ingresa tu correo electrónico"
+                placeholder="tu@correo.com"
                 className={inputClass}
                 required
               />
@@ -87,22 +78,20 @@ export default function LoginPage() {
                 type="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Ingresa tu contraseña"
+                placeholder="••••••••"
                 className={inputClass}
                 required
               />
             </Field>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-2 bg-dark text-white text-[12px] tracking-[0.25em] uppercase px-8 py-4 hover:bg-gold hover:text-dark transition-colors duration-200 disabled:opacity-50"
-            >
-              {loading ? "Cargando..." : "Iniciar sesión"}
+            <button type="submit" disabled={loading} className={`${btnPrimary} w-full mt-1`}>
+              {loading ? "Ingresando..." : "Iniciar sesión"}
             </button>
           </form>
         </div>
-      </section>
-    </>
+
+        <p className="text-center text-xs text-slate-400 mt-6">Vaya Turismo · Acceso restringido</p>
+      </div>
+    </div>
   );
 }

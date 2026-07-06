@@ -17,14 +17,12 @@ const TABS = [
 const TAB_FIELDS = {
   viajes: [
     { type: "text", id: "name", label: "Nombre completo", placeholder: "Ingresa tu nombre completo", required: true },
-    { type: "text", id: "email", label: "Email o teléfono", placeholder: "Ingresa un email o teléfono", required: true },
     { type: "city", id: "destino", label: "Destino", placeholder: "Ingrese el destino..." },
     { type: "passengers" },
     { type: "select", id: "tipoAlojamiento", label: "Tipo de alojamiento", options: ["Hotel", "Apartamento"], placeholder: "Seleccione el alojamiento" },
   ],
   aereos: [
     { type: "text", id: "name", label: "Nombre del pasajero", placeholder: "Ingresa el nombre del pasajero" },
-    { type: "text", id: "email", label: "Email o teléfono", placeholder: "Ingresa un email o teléfono" },
     { type: "select", id: "asistencia", label: "Asistencia al viajero", options: ["Si", "No"], placeholder: "Seleccione una opción" },
     { type: "airport", id: "origen", label: "Origen", placeholder: "Ingrese el origen..." },
     { type: "airport", id: "destino", label: "Destino", placeholder: "Ingrese el destino..." },
@@ -34,7 +32,6 @@ const TAB_FIELDS = {
   ],
   alojamiento: [
     { type: "text", id: "name", label: "Nombre del pasajero", placeholder: "Ingresa el nombre del pasajero" },
-    { type: "text", id: "email", label: "Email o teléfono", placeholder: "Ingresa un email o teléfono" },
     { type: "city", id: "destino", label: "Destino", placeholder: "Ingrese el destino..." },
     { type: "select", id: "tipoAlojamiento", label: "Tipo de alojamiento", options: ["Hotel", "Apartamento"], placeholder: "Seleccione una opción" },
     { type: "passengers" },
@@ -43,7 +40,6 @@ const TAB_FIELDS = {
   ],
   paquetes: [
     { type: "text", id: "name", label: "Nombre completo", placeholder: "Ingresa tu nombre completo" },
-    { type: "text", id: "email", label: "Email o teléfono", placeholder: "Ingresa un email o teléfono" },
     { type: "city", id: "destino", label: "Destino", placeholder: "Ingrese el destino..." },
     { type: "passengers" },
     { type: "select", id: "tipoAlojamiento", label: "Tipo de alojamiento", options: ["Hotel", "Apartamento"], placeholder: "Seleccione el alojamiento" },
@@ -52,7 +48,6 @@ const TAB_FIELDS = {
 
 const fieldLabels = {
   name: "Nombre",
-  email: "Email",
   origen: "Origen",
   destino: "Destino",
   partida: "Fecha de Partida",
@@ -199,12 +194,11 @@ function PassengerDropdown({ adultos, setAdultos, niños, setNiños, mayores, se
   );
 }
 
+const WHATSAPP_NUMBER = "5493513934673";
+
 export default function ContactoPage() {
   const [activeTab, setActiveTab] = useState("viajes");
-  const [formData, setFormData] = useState({ name: "", email: "" });
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({ name: "" });
   const [scrolled, setScrolled] = useState(false);
   const [inFooter, setInFooter] = useState(false);
 
@@ -292,46 +286,35 @@ export default function ContactoPage() {
     debouncedAirportSearch(value, field === "origen" ? setSuggestionsOrigen : setSuggestionsDestino);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setSuccess(false);
-    setError("");
 
-    const message = `Pasajeros:
-      - Adultos: ${adultos}
-      - Niños (0-11 años): ${niños}
-      - Mayores (+65 años): ${mayores}
-      - Personas con discapacidad: ${discapacidad}
+    const detailFields = TAB_FIELDS[activeTab].filter(
+      (f) => f.id && f.id !== "name" && formData[f.id]
+    );
 
-    Detalles:
-      ${Object.entries(formData)
-        .filter(([key]) => key !== "name" && key !== "email")
-        .map(([key, value]) => ` - ${fieldLabels[key] || key}: ${value}`)
-        .join("\n")}`;
+    const lines = [
+      `Hola! Quiero hacer una consulta sobre *${categoryMap[activeTab]}*.`,
+      "",
+      `Nombre: ${formData.name || "-"}`,
+      "",
+      `Pasajeros: ${adultos} adulto(s), ${niños} niño(s), ${mayores} mayor(es), ${discapacidad} con discapacidad`,
+    ];
 
-    const dataToSend = {
-      name: formData.name,
-      email: formData.email,
-      category: categoryMap[activeTab],
-      message,
-    };
-
-    try {
-      const response = await axios.post("https://viajes-back-sre6.onrender.com/contact_messages", dataToSend, {
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (response.status === 201) {
-        setSuccess(true);
-        setFormData({ name: "", email: "" });
-      }
-    } catch (err) {
-      console.error("Error in Axios request:", err.response || err.message);
-      setError("Error al enviar el mensaje. Por favor, inténtelo de nuevo.");
-    } finally {
-      setLoading(false);
+    if (detailFields.length > 0) {
+      lines.push(
+        "",
+        "Detalles:",
+        ...detailFields.map((f) => `- ${fieldLabels[f.id] || f.label}: ${formData[f.id]}`)
+      );
     }
+
+    if (formData.mensajeAdicional) {
+      lines.push("", `Mensaje: ${formData.mensajeAdicional}`);
+    }
+
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const renderField = (field) => {
@@ -474,21 +457,10 @@ export default function ContactoPage() {
               <div className="md:col-span-2 lg:col-span-3 flex flex-col items-center gap-4 pt-2">
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="bg-dark text-white text-[12px] tracking-[0.25em] uppercase px-10 py-4 hover:bg-gold hover:text-dark transition-colors duration-200 disabled:opacity-50"
+                  className="bg-dark text-white text-[12px] tracking-[0.25em] uppercase px-10 py-4 hover:bg-gold hover:text-dark transition-colors duration-200"
                 >
-                  {loading ? "Enviando..." : "Enviar"}
+                  Enviar por WhatsApp
                 </button>
-                {success && (
-                  <div className="w-full text-center text-[13px] text-green-700 bg-green-50 border border-green-200 px-4 py-3">
-                    ¡Mensaje enviado con éxito!
-                  </div>
-                )}
-                {error && (
-                  <div className="w-full text-center text-[13px] text-red-700 bg-red-50 border border-red-200 px-4 py-3">
-                    {error}
-                  </div>
-                )}
               </div>
             </form>
           </div>

@@ -12,6 +12,8 @@ import DateRangeField from "@/components/destinos/DateRangeField";
 import SelectField from "@/components/destinos/SelectField";
 import FiltersDrawer, { PRICE_RANGES, DURATION_RANGES } from "@/components/destinos/FiltersDrawer";
 
+const WHATSAPP_NUMBER = "5493513934673";
+
 const ALOJAMIENTOS = ["Hotel", "Resort", "Aparthotel", "Crucero"];
 
 const TIPOS = [
@@ -75,9 +77,6 @@ export default function PaquetesPage() {
   const [appliedFilters, setAppliedFilters] = useState({ categories: [], priceRange: null, durationRange: null });
 
   const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
 
   const listadoRef = useRef(null);
   const destacadosPrevRef = useRef(null);
@@ -152,40 +151,22 @@ export default function PaquetesPage() {
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setSuccess(false);
-    setError("");
 
-    const message = `Solicitud de paquete a medida:
-      - Destino deseado: ${formData.destino || "-"}
-      - Fecha aproximada: ${formData.fecha || "-"}
-      - Cantidad de personas: ${formData.personas || "-"}
-      - Presupuesto estimado: ${formData.presupuesto || "-"}`;
+    const lines = [
+      "Hola! Quiero armar un *paquete a medida*.",
+      "",
+      `Nombre: ${formData.name || "-"}`,
+      `WhatsApp: ${formData.whatsapp || "-"}`,
+      `Destino deseado: ${formData.destino || "-"}`,
+      `Fecha aproximada: ${formData.fecha || "-"}`,
+      `Cantidad de personas: ${formData.personas || "-"}`,
+      `Presupuesto estimado: ${formData.presupuesto || "-"}`,
+    ];
 
-    const dataToSend = {
-      name: formData.name,
-      email: formData.whatsapp,
-      category: "Paquetes a medida",
-      message,
-    };
-
-    try {
-      const response = await axios.post("https://viajes-back-sre6.onrender.com/contact_messages", dataToSend, {
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (response.status === 201) {
-        setSuccess(true);
-        setFormData({});
-      }
-    } catch (err) {
-      console.error("Error in Axios request:", err.response || err.message);
-      setError("Error al enviar la solicitud. Por favor, inténtelo de nuevo.");
-    } finally {
-      setLoading(false);
-    }
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -597,21 +578,10 @@ export default function PaquetesPage() {
               <div className="md:col-span-2 lg:col-span-3 flex flex-col items-center gap-4 pt-2">
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="bg-dark text-white text-[12px] tracking-[0.25em] uppercase px-10 py-4 hover:bg-gold hover:text-dark transition-colors duration-200 disabled:opacity-50"
+                  className="bg-dark text-white text-[12px] tracking-[0.25em] uppercase px-10 py-4 hover:bg-gold hover:text-dark transition-colors duration-200"
                 >
-                  {loading ? "Enviando..." : "Quiero mi propuesta"}
+                  Quiero mi propuesta por WhatsApp
                 </button>
-                {success && (
-                  <div className="w-full text-center text-[13px] text-green-700 bg-green-50 border border-green-200 px-4 py-3">
-                    ¡Solicitud enviada! Te contactaremos a la brevedad.
-                  </div>
-                )}
-                {error && (
-                  <div className="w-full text-center text-[13px] text-red-700 bg-red-50 border border-red-200 px-4 py-3">
-                    {error}
-                  </div>
-                )}
               </div>
             </form>
           </div>
