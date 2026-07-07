@@ -29,6 +29,42 @@ const TIPOS = [
   { id: "a-medida", label: "Paquetes a medida", icon: "🎯" },
 ];
 
+const ARGENTINA_DESTINOS = [
+  { name: "Buenos Aires", image: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=800&q=80" },
+  { name: "Bariloche", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Mountains_and_Lake_in_Bariloche_%28Unsplash%29.jpg/960px-Mountains_and_Lake_in_Bariloche_%28Unsplash%29.jpg" },
+  { name: "Mendoza", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Vineyard_in_Mendoza%2C_Argentina.jpg/960px-Vineyard_in_Mendoza%2C_Argentina.jpg" },
+  { name: "Cataratas del Iguazú", image: "https://upload.wikimedia.org/wikipedia/commons/f/f0/Cataratas027.jpg" },
+  { name: "Salta", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/AR378-Quebrada_de_Humahuaca.jpg/960px-AR378-Quebrada_de_Humahuaca.jpg" },
+  { name: "El Calafate", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Perito_Moreno_Glacier_Patagonia_Argentina_Luca_Galuzzi_2005.JPG/960px-Perito_Moreno_Glacier_Patagonia_Argentina_Luca_Galuzzi_2005.JPG" },
+];
+
+const EUROPA_DESTINOS = [
+  { name: "Santorini", image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&q=80" },
+  { name: "Roma", image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800&q=80" },
+  { name: "París", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Eiffel_Tower_sunset_skyline_%28Unsplash%29.jpg/960px-Eiffel_Tower_sunset_skyline_%28Unsplash%29.jpg" },
+  { name: "Ámsterdam", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Colorful_canal_houses_at_golden_hour_in_Damrak_avenue_Amsterdam_the_Netherlands.jpg/960px-Colorful_canal_houses_at_golden_hour_in_Damrak_avenue_Amsterdam_the_Netherlands.jpg" },
+  { name: "Barcelona", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Barcelona_-_Exterior_of_the_Apse_of_the_Sagrada_Fam%C3%ADlia_-_Western_exposure.jpg/960px-Barcelona_-_Exterior_of_the_Apse_of_the_Sagrada_Fam%C3%ADlia_-_Western_exposure.jpg" },
+  { name: "Londres", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Big_Ben_Westminster_Pier_Victoria_Embankment_River_Thames_City_of_Westminster_London_02.jpg/960px-Big_Ben_Westminster_Pier_Victoria_Embankment_River_Thames_City_of_Westminster_London_02.jpg" },
+];
+
+const ASIA_DESTINOS = [
+  { name: "Tokio", image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80" },
+  { name: "Bali", image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80" },
+  { name: "Dubái", image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80" },
+  { name: "Islas Maldivas", image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80" },
+  { name: "Bangkok", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Wat_Arun_Ratchawararam_and_the_Royal_Barge_Procession.jpg/960px-Wat_Arun_Ratchawararam_and_the_Royal_Barge_Procession.jpg" },
+  { name: "Singapur", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Marina_Bay_Sands_and_illuminated_polyhedral_building_Louis_Vuitton_over_the_water_at_blue_hour_with_pink_clouds_in_Singapore.jpg/960px-Marina_Bay_Sands_and_illuminated_polyhedral_building_Louis_Vuitton_over_the_water_at_blue_hour_with_pink_clouds_in_Singapore.jpg" },
+];
+
+const ESTADOS_UNIDOS_DESTINOS = [
+  { name: "Nueva York", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/View_of_Empire_State_Building_from_Rockefeller_Center_New_York_City_dllu.jpg/960px-View_of_Empire_State_Building_from_Rockefeller_Center_New_York_City_dllu.jpg" },
+  { name: "Miami", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Miami_skyline_from_Miami_Beach_2006_by_Averette101.jpg/960px-Miami_skyline_from_Miami_Beach_2006_by_Averette101.jpg" },
+  { name: "Los Ángeles", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Hollywood_Sign_close_up.jpg/960px-Hollywood_Sign_close_up.jpg" },
+  { name: "Las Vegas", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Las_Vegas_Strip_at_night%2C_2012.jpg/960px-Las_Vegas_Strip_at_night%2C_2012.jpg" },
+  { name: "San Francisco", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Golden_Gate_Bridge_as_seen_from_Marshall%E2%80%99s_Beach%2C_March_2018.jpg/960px-Golden_Gate_Bridge_as_seen_from_Marshall%E2%80%99s_Beach%2C_March_2018.jpg" },
+  { name: "Gran Cañón", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Grand_Canyon_%28Arizona%2C_USA%29%2C_South_Rim_nahe_Tusayan_--_2012_--_5893.jpg/960px-Grand_Canyon_%28Arizona%2C_USA%29%2C_South_Rim_nahe_Tusayan_--_2012_--_5893.jpg" },
+];
+
 const MOCK_PAQUETES = [
   { id: 1, destino: "Islas Maldivas", descripcion: "Villas sobre el agua, arrecifes de coral y atardeceres infinitos.", duracion: "10 días", precio: "USD 2.800", tipo: "luna-de-miel", category: "Playa", alojamiento: "Resort", destacado: true, imagen: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80" },
   { id: 2, destino: "Santorini", descripcion: "Arquitectura blanca, vinos locales y el mar Egeo de fondo.", duracion: "7 días", precio: "USD 1.900", tipo: "parejas", category: "Europa", alojamiento: "Hotel", destacado: true, imagen: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&q=80" },
@@ -54,6 +90,48 @@ function Field({ label, children }) {
       <label className="block text-[10px] tracking-[0.2em] uppercase text-muted font-normal mb-1.5">{label}</label>
       {children}
     </div>
+  );
+}
+
+function RegionDestinos({ eyebrow, title, destinos }) {
+  const whatsappNumber = WHATSAPP_NUMBER;
+
+  return (
+    <section className="bg-white py-24 px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-14">
+          <p className="text-gold text-xs tracking-[0.4em] uppercase mb-3 font-normal">{eyebrow}</p>
+          <h2 className="font-serif text-dark text-4xl md:text-5xl font-light tracking-tight">{title}</h2>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {destinos.map((d) => (
+            <div
+              key={d.name}
+              onClick={() => {
+                const texto = `Hola! Quiero consultar por un viaje a *${d.name}*.`;
+                window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(texto)}`, "_blank", "noopener,noreferrer");
+              }}
+              className="group cursor-pointer flex flex-col"
+            >
+              <div className="overflow-hidden" style={{ aspectRatio: "2/3" }}>
+                <img
+                  src={d.image}
+                  alt={d.name}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              </div>
+              <div className="flex items-center justify-between px-3 py-3 border border-t-0 border-gray-200 bg-white">
+                <h3 className="font-sans text-dark text-[14px] font-light tracking-wide">{d.name}</h3>
+                <svg className="w-4 h-4 text-dark shrink-0 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="1" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                </svg>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -85,7 +163,21 @@ export default function PaquetesPage() {
   useEffect(() => {
     axios
       .get("https://viajes-back-sre6.onrender.com/packages")
-      .then((res) => { if (res.data?.length) setPaquetes(res.data); })
+      .then((res) => {
+        if (!res.data?.length) return;
+        const normalizados = res.data.map((p) => ({
+          id: p.id,
+          destino: p.destino?.name || "",
+          descripcion: p.description,
+          duracion: p.duration_days ? `${p.duration_days} días` : "",
+          precio: p.price_amount ? `${p.price_currency} ${Number(p.price_amount).toLocaleString("es-AR")}` : "",
+          category: p.destino?.category || "",
+          alojamiento: p.accommodation || "",
+          destacado: !!p.featured,
+          imagen: p.images?.[0] || "/assets/images/places/image.png",
+        }));
+        setPaquetes(normalizados);
+      })
       .catch(() => {});
 
     const onScroll = () => setScrolled(window.scrollY > 200);
@@ -435,6 +527,11 @@ export default function PaquetesPage() {
           </div>
         </div>
       </section>
+
+      <RegionDestinos eyebrow="Cerca de casa" title="Recorré la Argentina" destinos={ARGENTINA_DESTINOS} />
+      <RegionDestinos eyebrow="Historia y encanto" title="Recorré Europa" destinos={EUROPA_DESTINOS} />
+      <RegionDestinos eyebrow="Culturas milenarias" title="Recorré Asia" destinos={ASIA_DESTINOS} />
+      <RegionDestinos eyebrow="El sueño americano" title="Recorré Estados Unidos" destinos={ESTADOS_UNIDOS_DESTINOS} />
 
       {/* Listado completo */}
       <section ref={listadoRef} className="relative z-10 bg-white pt-20 pb-24 px-6 scroll-mt-24">
